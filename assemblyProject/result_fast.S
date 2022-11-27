@@ -1,5 +1,5 @@
-	.intel_syntax noprefix
-	.text
+	.intel_syntax noprefix		# этот файл содержит код с максимальным использованием регистров процессора вместо стека
+	.text				# работает быстрее + занимает меньше места
 	.globl	func
 	.type	func, @function
 func:
