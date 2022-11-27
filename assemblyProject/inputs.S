@@ -1,7 +1,7 @@
 	.intel_syntax noprefix
 	.text
 	.section	.rodata
-.LC0:
+.LC0:					# в .LC лежат строки, которые понадобятся в ходе работы программы
 	.string	"a, b, left, right: "
 .LC1:
 	.string	"%lf"
