@@ -4,18 +4,18 @@
 	.globl	func
 	.type	func, @function
 func:
-	endbr64
+	endbr64			# в этой функции происходит просто подсчет a + b / (x * x * x * x);
 	push	rbp
 	mov	rbp, rsp
-	movsd	QWORD PTR -8[rbp], xmm0
-	movsd	xmm1, QWORD PTR b[rip]
+	movsd	QWORD PTR -8[rbp], xmm0		# -8[rbp] - значение х
+	movsd	xmm1, QWORD PTR b[rip]		# ~= mov для целых
 	movsd	xmm0, QWORD PTR -8[rbp]
 	mulsd	xmm0, xmm0
-	mulsd	xmm0, QWORD PTR -8[rbp]
+	mulsd	xmm0, QWORD PTR -8[rbp]		# mulsd Multiplies the source operand by destination operand
 	mulsd	xmm0, QWORD PTR -8[rbp]
 	divsd	xmm1, xmm0
 	movsd	xmm0, QWORD PTR a[rip]
-	addsd	xmm0, xmm1
+	addsd	xmm0, xmm1			# ~= add для целых
 	movq	rax, xmm0
 	movq	xmm0, rax
 	pop	rbp
@@ -29,18 +29,18 @@ getResult:
 	mov	rbp, rsp
 	sub	rsp, 24
 	pxor	xmm0, xmm0
-	movsd	QWORD PTR -8[rbp], xmm0
-	movsd	xmm0, QWORD PTR left[rip]
-	movsd	QWORD PTR -16[rbp], xmm0
-	jmp	.L4
-.L7:
+	movsd	QWORD PTR -8[rbp], xmm0		# -16[rbp] - result
+	movsd	xmm0, QWORD PTR left[rip]	
+	movsd	QWORD PTR -16[rbp], xmm0	# -16[rbp] - x
+	jmp	.L4				# переходим в цикл
+.L7:						# if (x!=0)
 	pxor	xmm0, xmm0
 	ucomisd	xmm0, QWORD PTR -16[rbp]
 	jp	.L9
 	pxor	xmm0, xmm0
 	ucomisd	xmm0, QWORD PTR -16[rbp]
 	je	.L5
-.L9:
+.L9:						# result += 0.00005 * (func(x) + func(x + 0.0001));
 	mov	rax, QWORD PTR -16[rbp]
 	movq	xmm0, rax
 	call	func
@@ -63,7 +63,7 @@ getResult:
 	movsd	xmm0, QWORD PTR .LC1[rip]
 	addsd	xmm0, xmm1
 	movsd	QWORD PTR -16[rbp], xmm0
-.L4:
+.L4:						# for (double x = left; x <= right - 0.0001; x += 0.0001) 
 	movsd	xmm0, QWORD PTR right[rip]
 	movsd	xmm1, QWORD PTR .LC1[rip]
 	subsd	xmm0, xmm1
@@ -77,8 +77,8 @@ getResult:
 	.size	getResult, .-getResult
 	.globl	checker
 	.type	checker, @function
-checker:
-	endbr64
+checker:					# в чекере происходит только подсчет одной функции
+	endbr64					# a * right - a * left + b / (3 * left * left * left) - b / (3 * right * right * right);
 	push	rbp
 	mov	rbp, rsp
 	movsd	xmm1, QWORD PTR a[rip]
@@ -127,21 +127,3 @@ checker:
 .LC3:
 	.long	0
 	.long	1074266112
-	.ident	"GCC: (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0"
-	.section	.note.GNU-stack,"",@progbits
-	.section	.note.gnu.property,"a"
-	.align 8
-	.long	1f - 0f
-	.long	4f - 1f
-	.long	5
-0:
-	.string	"GNU"
-1:
-	.align 8
-	.long	0xc0000002
-	.long	3f - 2f
-2:
-	.long	0x3
-3:
-	.align 8
-4:
