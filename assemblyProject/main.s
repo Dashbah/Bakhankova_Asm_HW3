@@ -1,4 +1,3 @@
-	.file	"main.c"
 	.intel_syntax noprefix
 	.text
 	.globl	a
@@ -6,7 +5,7 @@
 	.align 8
 	.type	a, @object
 	.size	a, 8
-a:
+a:				# объявление глобальных переменных
 	.zero	8
 	.globl	b
 	.align 8
@@ -27,7 +26,7 @@ left:
 right:
 	.zero	8
 	.section	.rodata
-.LC0:
+.LC0:						# в .LC лежат строки, которые понадобятся в ходе работы программы
 	.string	"Choose input type: "
 .LC1:
 	.string	"For console input enter 1 "
@@ -69,7 +68,7 @@ main:
 	sub	rsp, 48
 	lea	rax, .LC0[rip]
 	mov	rdi, rax
-	call	puts@PLT
+	call	puts@PLT		# вывод инструкций в консоль
 	lea	rax, .LC1[rip]
 	mov	rdi, rax
 	call	puts@PLT
@@ -79,13 +78,13 @@ main:
 	lea	rax, .LC3[rip]
 	mov	rdi, rax
 	call	puts@PLT
-	lea	rax, -44[rbp]
+	lea	rax, -44[rbp]		# в  -44[rbp] лежит inputType (от 1 до 3 либо другое)
 	mov	rsi, rax
 	lea	rax, .LC4[rip]
 	mov	rdi, rax
 	mov	eax, 0
-	call	__isoc99_scanf@PLT
-	mov	eax, DWORD PTR -44[rbp]
+	call	__isoc99_scanf@PLT	# читаем inputType
+	mov	eax, DWORD PTR -44[rbp]		# /switch-case по способу ввода(inputType)
 	cmp	eax, 3
 	je	.L2
 	cmp	eax, 3
@@ -95,7 +94,7 @@ main:
 	cmp	eax, 2
 	je	.L5
 	jmp	.L3
-.L4:
+.L4:					 # если ввели 1, вызываем consoleInput()
 	mov	eax, 0
 	call	consoleInput@PLT
 	xor	eax, 1
@@ -107,7 +106,7 @@ main:
 	call	printf@PLT
 	mov	eax, 0
 	jmp	.L12
-.L5:
+.L5:				# если ввели 2, вызываем fileInput()
 	mov	eax, 0
 	call	fileInput@PLT
 	xor	eax, 1
@@ -119,11 +118,11 @@ main:
 	call	printf@PLT
 	mov	eax, 0
 	jmp	.L12
-.L2:
+.L2:				# если ввели 3, вызываем randomGeneration()
 	mov	eax, 0
 	call	randomGeneration@PLT
 	jmp	.L8
-.L3:
+.L3:				# если ввели(inputType) не 1/2/3, пишем об этом в консоль и заканчиваем программу
 	lea	rax, .LC7[rip]
 	mov	rdi, rax
 	mov	eax, 0
@@ -140,32 +139,32 @@ main:
 	mov	rsi, rax
 	lea	rax, .LC9[rip]
 	mov	rdi, rax
-	call	fopen@PLT
+	call	fopen@PLT		# открываем файл для записи 
 	mov	QWORD PTR -24[rbp], rax
-	call	clock@PLT
-	mov	QWORD PTR -32[rbp], rax
-	mov	DWORD PTR -12[rbp], 0
+	call	clock@PLT		# записываем, сколько сейчас времени
+	mov	QWORD PTR -32[rbp], rax    # -32[rbp] - переменная t - время 
+	mov	DWORD PTR -12[rbp], 0      # -12[rbp] - переменная цикла i
 	jmp	.L10
 .L11:
 	mov	eax, 0
 	call	getResult@PLT
 	movq	rax, xmm0
-	mov	QWORD PTR -8[rbp], rax
+	mov	QWORD PTR -8[rbp], rax	    # в -8[rbp] лежит result (bool)
 	add	DWORD PTR -12[rbp], 1
 .L10:
-	cmp	DWORD PTR -12[rbp], 19
+	cmp	DWORD PTR -12[rbp], 19		# смотрим, нужно ли закончить цикл 
 	jle	.L11
-	call	clock@PLT
+	call	clock@PLT			# цикл закончился, вычисляем время сейчас 
 	sub	rax, QWORD PTR -32[rbp]
 	mov	QWORD PTR -32[rbp], rax
 	mov	eax, 0
-	call	checker@PLT
+	call	checker@PLT			# вычисляем ожидаемый результат
 	movq	rax, xmm0
-	mov	QWORD PTR -40[rbp], rax
+	mov	QWORD PTR -40[rbp], rax		# -40[rbp] - ожидаемый результат
 	lea	rax, .LC10[rip]
 	mov	rdi, rax
 	mov	eax, 0
-	call	printf@PLT
+	call	printf@PLT			# вывод результатов
 	mov	rax, QWORD PTR -8[rbp]
 	movq	xmm0, rax
 	lea	rax, .LC11[rip]
@@ -188,7 +187,7 @@ main:
 	mov	esi, 1
 	lea	rax, .LC13[rip]
 	mov	rdi, rax
-	call	fwrite@PLT
+	call	fwrite@PLT			# запись результата в файл
 	mov	rdx, QWORD PTR -8[rbp]
 	mov	rax, QWORD PTR -24[rbp]
 	movq	xmm0, rdx
@@ -229,21 +228,3 @@ main:
 	leave
 	ret
 	.size	main, .-main
-	.ident	"GCC: (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0"
-	.section	.note.GNU-stack,"",@progbits
-	.section	.note.gnu.property,"a"
-	.align 8
-	.long	1f - 0f
-	.long	4f - 1f
-	.long	5
-0:
-	.string	"GNU"
-1:
-	.align 8
-	.long	0xc0000002
-	.long	3f - 2f
-2:
-	.long	0x3
-3:
-	.align 8
-4:
