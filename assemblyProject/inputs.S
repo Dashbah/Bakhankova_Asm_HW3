@@ -14,13 +14,13 @@ consoleInput:
 	mov	rbp, rsp
 	lea	rax, .LC0[rip]
 	mov	rdi, rax
-	call	puts@PLT
+	call	puts@PLT         # printf("a, b, left, right: \n");
 	lea	rax, a[rip]
 	mov	rsi, rax
 	lea	rax, .LC1[rip]
 	mov	rdi, rax
 	mov	eax, 0
-	call	__isoc99_scanf@PLT
+	call	__isoc99_scanf@PLT   # здесь мы считываем 4 параметра из консоли
 	lea	rax, b[rip]
 	mov	rsi, rax
 	lea	rax, .LC1[rip]
@@ -39,14 +39,14 @@ consoleInput:
 	mov	rdi, rax
 	mov	eax, 0
 	call	__isoc99_scanf@PLT
-	movsd	xmm1, QWORD PTR left[rip]
+	movsd	xmm1, QWORD PTR left[rip] # /проверка корректности введенных данных left и right
 	pxor	xmm0, xmm0
-	comisd	xmm0, xmm1
+	comisd	xmm0, xmm1                # функция сравнения чисел с плавающей точкой 
 	jb	.L2
 	movsd	xmm0, QWORD PTR right[rip]
 	pxor	xmm1, xmm1
 	comisd	xmm0, xmm1
-	jnb	.L4
+	jnb	.L4			  # \проверка корректности введенных данных left и right
 .L2:
 	movsd	xmm0, QWORD PTR left[rip]
 	movsd	xmm1, QWORD PTR right[rip]
@@ -57,7 +57,7 @@ consoleInput:
 	jmp	.L7
 .L9:
 	mov	eax, 1
-.L7:
+.L7:					# выход из функции
 	pop	rbp
 	ret
 	.size	consoleInput, .-consoleInput
@@ -79,32 +79,32 @@ fileInput:
 	lea	rax, .LC3[rip]
 	mov	rdi, rax
 	mov	eax, 0
-	call	printf@PLT
+	call	printf@PLT		# просим пользователя ввести имя файла
 	lea	rax, -64[rbp]
 	mov	rsi, rax
 	lea	rax, .LC4[rip]
 	mov	rdi, rax
 	mov	eax, 0
-	call	__isoc99_scanf@PLT
+	call	__isoc99_scanf@PLT      # считываем имя файла
 	lea	rax, -64[rbp]
 	mov	esi, 0
 	mov	rdi, rax
-	call	access@PLT
+	call	access@PLT		# проверяем, существует ли такой файл
 	test	eax, eax
-	jne	.L11
-	lea	rax, -64[rbp]
+	jne	.L11			# прыгаем, если не существует
+	lea	rax, -64[rbp]		
 	lea	rdx, .LC5[rip]
 	mov	rsi, rdx
 	mov	rdi, rax
-	call	fopen@PLT
-	mov	QWORD PTR -8[rbp], rax
+	call	fopen@PLT		 # открываем файл
+	mov	QWORD PTR -8[rbp], rax   # -8[rbp] - файл ввода
 	mov	rax, QWORD PTR -8[rbp]
 	lea	rdx, a[rip]
 	lea	rcx, .LC1[rip]
 	mov	rsi, rcx
 	mov	rdi, rax
 	mov	eax, 0
-	call	__isoc99_fscanf@PLT
+	call	__isoc99_fscanf@PLT      # функция считывания параметров из файла
 	mov	rax, QWORD PTR -8[rbp]
 	lea	rdx, b[rip]
 	lea	rcx, .LC1[rip]
@@ -153,11 +153,11 @@ randomGeneration:
 	push	rbp
 	mov	rbp, rsp
 	sub	rsp, 16
-	lea	rax, -8[rbp]
+	lea	rax, -8[rbp]		# -8[rbp] - time_t t
 	mov	rdi, rax
 	call	time@PLT
 	mov	edi, eax
-	call	srand@PLT
+	call	srand@PLT               # дальше происходит генерация параметров
 	call	rand@PLT
 	mov	edx, eax
 	movsx	rax, edx
@@ -244,7 +244,7 @@ randomGeneration:
 	lea	rax, .LC8[rip]
 	mov	rdi, rax
 	mov	eax, 0
-	call	printf@PLT
+	call	printf@PLT			# выводим сгенерированные параметры в консоль
 	mov	rax, QWORD PTR a[rip]
 	movq	xmm0, rax
 	lea	rax, .LC1[rip]
